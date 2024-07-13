@@ -110,7 +110,6 @@ local lights = {
         side = "right",
         level = "bottom",
     },
-
     {
         id = "19",
         type = "diagonnal",
@@ -129,7 +128,6 @@ local lights = {
         side = "right",
         level = "top",
     },
-    
     {
         id = "22",
         type = "column",
