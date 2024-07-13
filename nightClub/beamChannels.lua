@@ -1,45 +1,56 @@
-local channels = {
-    channel = "GLOBAL",
-    children = {
-        {
-            channel = "DL",
-            children = {
-                { channel = "DL1" },
-                { channel = "DL2" },
-                { channel = "DL3" },
-                { channel = "DL4" },
-            },
-        },
-        {
-            channel = "DR",
-            children = {
-                { channel = "DR1" },
-                { channel = "DR2" },
-                { channel = "DR3" },
-                { channel = "DR4" },
-            },
-        },
-        {
-            channel = "U",
-            children = {
-                { channel = "U1" },
-                { channel = "U2" },
-                { channel = "U3" },
-                { channel = "U4" },
-                { channel = "U5" },
-                { channel = "U6" },
-            },
-        },
+local lights = {
+    {
+        id = "1",
+        type = "column",
+        side = "left",
+        level = "bottom",
     },
-}
-
-local fxChannels = {
-    channel = "GLOBALFX",
-    enable = false,
-    children = {
-        {
-            channel = "SMOKE1",
-            enable = false,
-        }
-    }
+    {
+        id = "2",
+        type = "diagonnal",
+        side = "left",
+        level = "bottom",
+    },
+    {
+        id = "3",
+        type = "column",
+        side = "left",
+        level = "bottom",
+    },
+    {
+        id = "4",
+        type = "diagonnal",
+        side = "left",
+        level = "bottom",
+    },
+    {
+        id = "5",
+        type = "column",
+        side = "left",
+        level = "top",
+    },
+    {
+        id = "6",
+        type = "diagonnal",
+        side = "left",
+        level = "top",
+    },
+    {
+        id = "7",
+        type = "column",
+        side = "left",
+        level = "top",
+    },
+    {
+        id = "8",
+        type = "diagonnal",
+        side = "left",
+        level = "top",
+    },
+    {
+        id = "9",
+        type = "column",
+        side = "right",
+        level = "bottom",
+    },    -- ...
 }
