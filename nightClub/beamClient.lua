@@ -1,5 +1,5 @@
 local redstoneSideOutput = "top"
-local channels = {"GLOBAL", "DL", "DL1"}
+local channels = {1, "column", "left", "bottom"}
 
 function tableContains(table, element)
     for _, value in pairs(table) do
@@ -25,7 +25,7 @@ if not modem then
     showMessage("Modem not found.", colors.red)
     return
 end
-modem.open(31001)
+modem.open(31002)
 
 while true do
     local event, param1, param2, param3, param4, param5 = os.pullEvent()
