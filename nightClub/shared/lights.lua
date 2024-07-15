@@ -1,5 +1,5 @@
 local lights = {
-    -- Left side
+    -- Left side (1 --> 6)
     {
         id = 1,
         type = "column",
@@ -36,7 +36,7 @@ local lights = {
         side = "left",
         level = "top",
     },
-    -- Back side
+    -- Back side (7 --> 15)
     {
         id = 7,
         type = "column",
@@ -91,7 +91,7 @@ local lights = {
         side = "back",
         level = "top",
     },
-    -- Right side
+    -- Right side (16 --> 24)
     {
         id = 16,
         type = "column",
@@ -120,36 +120,69 @@ local lights = {
         id = 20,
         type = "column",
         side = "right",
-        level = "top",
+        level = "bottom",
     },
     {
         id = 21,
         type = "diagonnal",
         side = "right",
-        level = "top",
+        level = "bottom",
     },
     {
         id = 22,
         type = "column",
         side = "right",
-        level = "top",
+        level = "bottom",
     },
     {
         id = 23,
         type = "column",
         side = "right",
-        level = "top",
+        level = "bottom",
     },
     {
         id = 24,
         type = "diagonnal",
         side = "right",
-        level = "top",
+        level = "bottom",
     },
-    -- Top
+    -- Top (25 --> 30)
     {
         id = 25,
         type = "diagonnal",
+        side = "front",
+        level = "top",
+    },
+    {
+        id = 26,
+        type = "diagonnal",
+        side = "front",
         side = "top",
-    }
+    },
+    {
+        id = 27,
+        type = "diagonnal",
+        side = "front",
+        level = "top",
+    },
+    {
+        id = 28,
+        type = "diagonnal",
+        side = "front",
+        level = "top",
+    },
+    {
+        id = 29,
+        type = "diagonnal",
+        side = "front",
+        level = "top",
+    },
+    {
+        id = 30,
+        type = "diagonnal",
+        side = "front",
+        level = "top",
+    },
 }
+
+return lights
