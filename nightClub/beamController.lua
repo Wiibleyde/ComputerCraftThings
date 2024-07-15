@@ -138,6 +138,7 @@ local effects = {
 }
 
 local function drawUI()
+    monitor.setTextColor(colors.white)
     monitor.clear()
     monitor.setCursorPos(1, 1)
     monitor.write("BeamOS")
@@ -156,11 +157,9 @@ local function drawUI()
                 local x = (col - 1) * columnWidth + 1
                 local y = 2 + row
                 if light.enabled then
-                    monitor.setBackgroundColor(colors.white)
-                    monitor.setTextColor(colors.black)
+                    monitor.setTextColor(colors.green)
                 else
-                    monitor.setBackgroundColor(colors.black)
-                    monitor.setTextColor(colors.white)
+                    monitor.setTextColor(colors.red)
                 end
                 monitor.setCursorPos(x, y)
                 monitor.write(light.id)
@@ -168,13 +167,18 @@ local function drawUI()
         end
     end
 
+    monitor.setTextColor(colors.white)
     monitor.setCursorPos(1, screenHeight - #effects - 1)
     monitor.write("Effects:")
     for i, effect in pairs(effects) do
         monitor.setCursorPos(1, screenHeight - #effects + i - 1)
+        if effect.active then
+            monitor.setTextColor(colors.green)
+        else
+            monitor.setTextColor(colors.red)
+        end
         monitor.write(i .. ". " .. effect.name)
         monitor.setCursorPos(screenWidth - 1, screenHeight - #effects + i - 1)
-        monitor.write(effect.active and "X" or " ")
     end
 end
 
