@@ -1,73 +1,5 @@
-local channels = {
-    channel = "GLOBAL",
-    enable = false,
-    children = {
-        {
-            channel = "DL",
-            enable = false,
-            children = {
-                { channel = "DL1", enable = false },
-                { channel = "DL2", enable = false },
-                { channel = "DL3", enable = false },
-                { channel = "DL4", enable = false },
-            },
-        },
-        {
-            channel = "DR",
-            enable = false,
-            children = {
-                { channel = "DR1", enable = false },
-                { channel = "DR2", enable = false },
-                { channel = "DR3", enable = false },
-                { channel = "DR4", enable = false },
-            },
-        },
-        {
-            channel = "U",
-            enable = false,
-            children = {
-                { channel = "U1", enable = false },
-                { channel = "U2", enable = false },
-                { channel = "U3", enable = false },
-                { channel = "U4", enable = false },
-                { channel = "U5", enable = false },
-                { channel = "U6", enable = false },
-            },
-        },
-    }
-}
 
-local fxChannels = {
-    channel = "GLOBALFX",
-    enable = false,
-    children = {
-        {
-            channel = "SMOKE1",
-            enable = false,
-        }
-    }
-}
-
-
-local effects = {
-    {
-        name = "Strob",
-        active = false,
-    },
-    {
-        name = "Turn on all",
-        active = false,
-    },
-    {
-        name = "Turn off all",
-        active = false,
-    },
-    {
-        name = "Smoke",
-        active = false,
-    },
-}
-
+local lights = require("/shared/lights")
 local strobActivated = false
 
 local function showMessage(message, color)
@@ -90,117 +22,152 @@ if not monitor then
     showMessage("Monitor not found.", colors.red)
     return
 end
-modem.open(31001)
+modem.open(31002)
 
 local screenWidth, screenHeight = monitor.getSize()
 
 local function sendMessage(channel, action)
-    modem.transmit(31001, 31001, {channel = channel, action = action})
+    modem.transmit(31002, 31002, {channel = channel, action = action})
 end
 
-local function enableChannel(channel)
-    channel.enable = true
-    sendMessage(channel.channel, "on")
-    if channel.children then
-        for _, child in pairs(channel.children) do
-            enableChannel(child)
-        end
-    end
+local function enableLight(light)
+    light.enabled = true
+    sendMessage(light.id, "on")
 end
 
-local function disableChannel(channel)
-    channel.enable = false
-    sendMessage(channel.channel, "off")
-    if channel.children then
-        for _, child in pairs(channel.children) do
-            disableChannel(child)
-        end
-    end
+local function disableLight(light)
+    light.enabled = false
+    sendMessage(light.id, "off")
 end
 
-local function turnOnAllChannels()
-    enableChannel(channels)
-end
-
-local function turnOffAllChannels()
-    disableChannel(channels)
-end
-
-local function toggleChannel(channel)
-    if channel.enable then
-        disableChannel(channel)
+local function toggleLight(light)
+    if light.enabled then
+        disableLight(light)
     else
-        enableChannel(channel)
+        enableLight(light)
     end
 end
 
-local function getRandomChannel(channels)
-    local randomChannel = channels[math.random(#channels)]
-    if randomChannel.children then
-        return getRandomChannel(randomChannel.children)
+local function turnOnAllLights()
+    for _, light in pairs(lights) do
+        enableLight(light)
     end
-    return randomChannel
+end
+
+local function turnOnAllDiagonnalLights()
+    for _, light in pairs(lights) do
+        if light.type == "diagonnal" then
+            enableLight(light)
+        end
+    end
+end
+
+local function turnOffAllDiagonnalLights()
+    for _, light in pairs(lights) do
+        if light.type == "diagonnal" then
+            disableLight(light)
+        end
+    end
+end
+
+local function turnOnAllColumnLights()
+    for _, light in pairs(lights) do
+        if light.type == "column" then
+            enableLight(light)
+        end
+    end
+end
+
+local function turnOffAllColumnLights()
+    for _, light in pairs(lights) do
+        if light.type == "column" then
+            disableLight(light)
+        end
+    end
+end
+
+local function turnOffAllLights()
+    for _, light in pairs(lights) do
+        disableLight(light)
+    end
+end
+
+local function getRandomLight(lights)
+    return lights[math.random(1, #lights)]
 end
 
 local function strobEffect()
-    local randomChannel = getRandomChannel(channels.children)
-    toggleChannel(randomChannel)
-    sleep(0.01)
-    toggleChannel(randomChannel)
-    randomChannel = getRandomChannel(channels.children)
-    toggleChannel(randomChannel)
-    sleep(0.01)
-    toggleChannel(randomChannel)
-end
-
-local function toggleStrob()
-    if effects[1].active then
-        effects[1].active = false
-        strobActivated = false
-    else
-        effects[1].active = true
-        strobActivated = true
-        parallel.waitForAny(
-            function()
-                while strobActivated do
-                    strobEffect()
-                    sleep(0.1)  -- Added to prevent busy-waiting
-                end
-            end,
-            function()
-                while strobActivated do
-                    sleep(0.1)
-                end
-            end
-        )
+    while strobActivated do
+        local randomLight = getRandomLight(lights)
+        toggleLight(randomLight)
+        sleep(0.003)
+        toggleLight(randomLight)
     end
 end
 
-
-local function toggleSmoke()
-    if fxChannels.enable then
-        fxChannels.enable = false
-        effects[4].active = false
-        sendMessage(fxChannels.channel, "off")
-    else
-        fxChannels.enable = true
-        effects[4].active = true
-        sendMessage(fxChannels.channel, "on")
-    end    
+local function toggleStrob()
+    strobActivated = true
+    parallel.waitForAny(strobEffect, function()
+        os.pullEvent("monitor_touch")
+        strobActivated = false
+    end)
+    turnOffAllLights()
 end
+
+local effects = {
+    {
+        name = "Strob",
+        active = false,
+    },
+    {
+        name = "Turn on all",
+        active = false,
+    },
+    {
+        name = "Turn off all",
+        active = false,
+    },
+    {
+        name = "Toggle all diagonnal",
+        active = false,
+    },
+    {
+        name = "Toggle all column",
+        active = false,
+    },
+}
 
 local function drawUI()
     monitor.clear()
     monitor.setCursorPos(1, 1)
     monitor.write("BeamOS")
     monitor.setCursorPos(1, 2)
-    monitor.write("Channels:")
-    for i, channel in pairs(channels.children) do
-        monitor.setCursorPos(1, 2 + i)
-        monitor.write(i .. ". " .. channel.channel)
-        monitor.setCursorPos(screenWidth - 1, 2 + i)
-        monitor.write(channel.enable and "X" or " ")
+    monitor.write("Lights:")
+
+    local columns = 4
+    local lightsPerColumn = math.ceil(#lights / columns)
+    local columnWidth = math.floor(screenWidth / columns)
+
+    for col = 1, columns do
+        for row = 1, lightsPerColumn do
+            local lightIndex = (col - 1) * lightsPerColumn + row
+            if lights[lightIndex] then
+                local light = lights[lightIndex]
+                local x = (col - 1) * columnWidth + 1
+                local y = 2 + row
+                if light.enabled then
+                    monitor.setBackgroundColor(colors.white)
+                    monitor.setTextColor(colors.black)
+                else
+                    monitor.setBackgroundColor(colors.black)
+                    monitor.setTextColor(colors.white)
+                end
+                monitor.setCursorPos(x, y)
+                monitor.write(light.id)
+            end
+        end
     end
+
     monitor.setCursorPos(1, screenHeight - #effects - 1)
     monitor.write("Effects:")
     for i, effect in pairs(effects) do
@@ -212,19 +179,39 @@ local function drawUI()
 end
 
 local function handleClick(x, y)
-    if y > 2 and y < 2 + #channels.children + 1 then
-        print("Toggling channel " .. y - 2)
-        toggleChannel(channels.children[y - 2])
+    local columns = 4
+    local lightsPerColumn = math.ceil(#lights / columns)
+    local columnWidth = math.floor(screenWidth / columns)
+    local clickedColumn = math.ceil(x / columnWidth)
+    local clickedRow = y - 2
+    local lightIndex = (clickedColumn - 1) * lightsPerColumn + clickedRow
+    if y > 2 and y < 2 + lightsPerColumn + 1 and lightIndex <= #lights then
+        toggleLight(lights[lightIndex])
     elseif y > screenHeight - #effects - 1 and y < screenHeight then
-        local effect = effects[y - (screenHeight - #effects) + 1]
+        local effectIndex = y - (screenHeight - #effects) + 1
+        local effect = effects[effectIndex]
         if effect.name == "Strob" then
             toggleStrob()
         elseif effect.name == "Turn on all" then
-            turnOnAllChannels()
+            turnOnAllLights()
         elseif effect.name == "Turn off all" then
-            turnOffAllChannels()
-        elseif effect.name == "Smoke" then
-            toggleSmoke()
+            turnOffAllLights()
+        elseif effect.name == "Toggle all diagonnal" then
+            if effect.active then
+                turnOffAllDiagonnalLights()
+                effect.active = false
+            else
+                turnOnAllDiagonnalLights()
+                effect.active = true
+            end
+        elseif effect.name == "Toggle all column" then
+            if effect.active then
+                turnOffAllColumnLights()
+                effect.active = false
+            else
+                turnOnAllColumnLights()
+                effect.active = true
+            end
         end
     end
     drawUI()
