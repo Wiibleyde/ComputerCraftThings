@@ -1,14 +1,5 @@
+local id = 1
 local redstoneSideOutput = "top"
-local channels = {1, "column", "left", "bottom"}
-
-function tableContains(table, element)
-    for _, value in pairs(table) do
-        if value == element then
-            return true
-        end
-    end
-    return false
-end
 
 local function showMessage(message, color)
     term.setTextColor(color)
@@ -32,7 +23,7 @@ while true do
 
     if event == "modem_message" then
         local channel, replyChannel, message, distance = param2, param3, param4, param5
-        if tableContains(channels, message.channel) then
+        if message.channel == id then
             if message.action == "on" then
                 redstone.setOutput(redstoneSideOutput, true)
             elseif message.action == "off" then
