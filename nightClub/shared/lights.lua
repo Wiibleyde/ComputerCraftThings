@@ -158,14 +158,14 @@ local lights = {
     },
     {
         id = 23,
-        type = "column",
+        type = "diagonnal",
         side = "right",
         level = "bottom",
         enabled = false,
     },
     {
         id = 24,
-        type = "diagonnal",
+        type = "column",
         side = "right",
         level = "bottom",
         enabled = false,
