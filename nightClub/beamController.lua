@@ -1,4 +1,3 @@
-
 local lights = require("/shared/lights")
 local strobActivated = false
 
@@ -99,9 +98,12 @@ end
 local function strobEffect()
     while strobActivated do
         local randomLight = getRandomLight(lights)
+        local randomLight2 = getRandomLight(lights)
         toggleLight(randomLight)
-        sleep(0.003)
+        toggleLight(randomLight2)
+        sleep(0.001)
         toggleLight(randomLight)
+        toggleLight(randomLight2)
     end
 end
 
@@ -223,7 +225,11 @@ end
 
 drawUI()
 
-while true do
-    local event, side, x, y = os.pullEvent("monitor_touch")
-    handleClick(x, y)
+local function mainLoop()
+    while true do
+        local event, side, x, y = os.pullEvent("monitor_touch")
+        handleClick(x, y)
+    end
 end
+
+parallel.waitForAny(mainLoop)
