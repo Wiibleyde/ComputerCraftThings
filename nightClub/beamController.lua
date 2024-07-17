@@ -95,26 +95,6 @@ local function getRandomLight(lights)
     return lights[math.random(1, #lights)]
 end
 
-local function strobEffect()
-    while strobActivated do
-        local randomLight = getRandomLight(lights)
-        local randomLight2 = getRandomLight(lights)
-        toggleLight(randomLight)
-        toggleLight(randomLight2)
-        sleep(0.001)
-        toggleLight(randomLight)
-        toggleLight(randomLight2)
-    end
-end
-
-local function toggleStrob()
-    strobActivated = true
-    parallel.waitForAny(strobEffect, function()
-        os.pullEvent("monitor_touch")
-        strobActivated = false
-    end)
-    turnOffAllLights()
-end
 
 local effects = {
     {
@@ -184,6 +164,41 @@ local function drawUI()
     end
 end
 
+local function strobEffect()
+    while true do
+        if strobActivated then 
+            local randomLight = getRandomLight(lights)
+            local randomLight2 = getRandomLight(lights)
+            toggleLight(randomLight)
+            drawUI()
+            toggleLight(randomLight2)
+            drawUI()
+            sleep(0.001)
+            toggleLight(randomLight)
+            drawUI()
+            toggleLight(randomLight2)
+            drawUI()
+        else
+            sleep(0.1)
+            return
+        end
+    end
+end
+
+local function toggleStrob()
+    strobActivated = not strobActivated
+    if strobActivated then
+        parallel.waitForAny(strobEffect, function() 
+            os.pullEvent("monitor_touch")
+            strobActivated = false
+            turnOffAllLights()
+        end)
+    else
+        turnOffAllLights()
+    end        
+end
+
+
 local function handleClick(x, y)
     local columns = 4
     local lightsPerColumn = math.ceil(#lights / columns)
@@ -232,4 +247,4 @@ local function mainLoop()
     end
 end
 
-parallel.waitForAny(mainLoop)
+parallel.waitForAll(mainLoop, strobEffect)
